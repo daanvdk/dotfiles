@@ -17,6 +17,7 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'joshdick/onedark.vim'
 Plugin 'Yggdroot/indentLine'
 Plugin 'scrooloose/nerdtree'
+Plugin 'Xuyuanp/nerdtree-git-plugin'
 " Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'vim-airline/vim-airline'
 Plugin 'jmcantrell/vim-virtualenv'
@@ -55,6 +56,7 @@ set fillchars+=vert:\
 highlight VertSplit ctermbg=234
 highlight LineNr ctermfg=241
 highlight Comment ctermfg=243
+highlight airline_tabfill ctermbg=234
 set colorcolumn=80
 set tabstop=4
 set shiftwidth=4
