@@ -133,19 +133,18 @@ prompt_git() {
     BRANCH=${BRANCH:-HEAD}
     eval "git diff-index --quiet HEAD --"
     DIRTY=$?
-    [[ DIRTY -ne 0 ]] && FG=94 || FG=64
-    [[ DIRTY -ne 0 ]] && BG=178 || BG=113
+    [[ $DIRTY -ne 0 ]] && FG=94 || FG=64
+    [[ $DIRTY -ne 0 ]] && BG=178 || BG=113
     prompt_segment $BG $FG "%{\e[1m%}  $BRANCH$CHANGES %{\e[0m%}"
   fi
 }
 
-prompt_result() {
-  if [[ $RETVAL -ne 0 ]]; then
-    rprompt_segment 124 211 "%{\e[1m%} $RETVAL "
-  fi 
-}
+RETVAL=0
 
 build_prompt() {
+  RETVAL=$?
+  [[ $RETVAL -ne 0 ]] && ZSH_COLOR_PRIMARY=161 || ZSH_COLOR_PRIMARY=38
+  [[ $RETVAL -ne 0 ]] && ZSH_COLOR_SECONDARY=89 || ZSH_COLOR_SECONDARY=24
   local RES
   FIRST=1
   RES="$(prompt_venv)"
@@ -156,15 +155,7 @@ build_prompt() {
   echo $RES
 }
 
-RETVAL=0
 build_rprompt() {
-  RETVAL=$?
-  local RES
-  RES="$(prompt_result)"
-  if [[ -n $RES ]]; then
-    RES+="%{\e[0m%}"
-  fi
-  echo $RES
 }
 
 setopt prompt_subst
