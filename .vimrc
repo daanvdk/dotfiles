@@ -56,7 +56,6 @@ set fillchars+=vert:\
 highlight VertSplit ctermbg=234
 highlight LineNr ctermfg=241
 highlight Comment ctermfg=243
-highlight airline_tabfill ctermbg=234
 set colorcolumn=80
 set tabstop=4
 set shiftwidth=4
