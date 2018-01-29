@@ -135,7 +135,7 @@ prompt_git() {
     DIRTY=$?
     [[ $DIRTY -ne 0 ]] && FG=94 || FG=64
     [[ $DIRTY -ne 0 ]] && BG=178 || BG=113
-    prompt_segment $BG $FG "%{\e[1m%}  $BRANCH$CHANGES %{\e[0m%}"
+    rprompt_segment $BG $FG "%{\e[1m%}  $BRANCH$CHANGES %{\e[0m%}%{\e[48;5;${BG}m%}"
   fi
 }
 
@@ -144,18 +144,27 @@ RETVAL=0
 build_prompt() {
   RETVAL=$?
   [[ $RETVAL -ne 0 ]] && ZSH_COLOR_PRIMARY=161 || ZSH_COLOR_PRIMARY=38
-  [[ $RETVAL -ne 0 ]] && ZSH_COLOR_SECONDARY=89 || ZSH_COLOR_SECONDARY=24
+  [[ $RETVAL -ne 0 ]] && ZSH_COLOR_SECONDARY=53 || ZSH_COLOR_SECONDARY=24
   local RES
   FIRST=1
-  RES="$(prompt_venv)"
-  [[ -n $RES ]] && FIRST=0
+  RES+="$(prompt_venv)"
+  [[ -n $RES ]] && FIRST=0 || FIRST=1
   RES+="$(prompt_user)"
   FIRST=0
-  RES+="$(prompt_git)$(prompt_path)%{\e[49m%}%{\e[0m%} "
+  RES+="$(prompt_path)%{\e[49m%}%{\e[0m%} "
   echo $RES
 }
 
 build_rprompt() {
+  RETVAL=$?
+  [[ $RETVAL -ne 0 ]] && ZSH_COLOR_PRIMARY=161 || ZSH_COLOR_PRIMARY=38
+  [[ $RETVAL -ne 0 ]] && ZSH_COLOR_SECONDARY=53 || ZSH_COLOR_SECONDARY=24
+  local RES
+  RES="$(prompt_git)"
+  if [[ -n $RES ]]; then
+    RES+="%{\e[0m%}"
+  fi
+  echo $RES
 }
 
 setopt prompt_subst
