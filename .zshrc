@@ -103,7 +103,7 @@ prompt_segment_end() {
   local STYLE_A STYLE_B
   STYLE_A="%{\e[48;5;$1m\e[38;5;$2m%}"
   STYLE_B="%{\e[m\e[38;5;$1m%}"
-  echo "${STYLE_A}$3${STYLE_B}%{\e[0m%} "
+  echo "${STYLE_A}$3${STYLE_B}%{\e[0m%}"
 }
 
 rprompt_segment() {
@@ -114,7 +114,7 @@ rprompt_segment() {
 }
 
 rprompt_end() {
-  echo "%{\e[0m%}"
+  # echo "%{\e[0m%}"
 }
 
 prompt_venv() {
@@ -131,10 +131,10 @@ prompt_path() {
   local DISPLAY_PATH SEPERATOR
   SEPERATOR=" %{\e[38;5;235m%}%{\e[38;5;255m%} "
   DISPLAY_PATH="${PWD/#$HOME/~}"
+  DISPLAY_PATH="${DISPLAY_PATH/#\//}"
   DISPLAY_PATH="${DISPLAY_PATH//\//$SEPERATOR}"
   prompt_segment_end 239 255 " $DISPLAY_PATH "
 }
-
 
 prompt_git() {
   local BRANCH COLOR
@@ -159,9 +159,12 @@ build_prompt() {
 }
 
 build_rprompt() {
-  local RETVAL
-  RETVAL=$?
-  echo "$(prompt_git)$(prompt_result $RETVAL)$(rprompt_end)"
+  local RES
+  RES="$(prompt_git)"
+  if [[ -n $RES ]]; then
+    RES+="%{\e[0m%}"
+  fi
+  echo $RES
 }
 
 setopt prompt_subst

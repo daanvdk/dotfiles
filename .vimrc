@@ -50,6 +50,7 @@ colorscheme onedark
 let g:indentLine_char = '▏'
 
 let NERDTreeMinimalUI = 1
+let NERDTreeShowHidden=1
 set fillchars+=vert:\ 
 highlight VertSplit ctermbg=234
 highlight LineNr ctermfg=241
