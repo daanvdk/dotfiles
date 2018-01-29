@@ -91,19 +91,12 @@ export ZLE_RPROMPT_INDENT=0
 
 ZSH_COLOR_PRIMARY=38
 ZSH_COLOR_SECONDARY=24
+FIRST=0
 
 prompt_segment() {
-  local STYLE_A STYLE_B
-  STYLE_A="%{\e[48;5;$1m\e[38;5;$2m%}"
-  STYLE_B="%{\e[48;5;$3m\e[38;5;$1m%}"
-  echo "${STYLE_A}$4${STYLE_B}"
-}
-
-prompt_segment_end() {
-  local STYLE_A STYLE_B
-  STYLE_A="%{\e[48;5;$1m\e[38;5;$2m%}"
-  STYLE_B="%{\e[m\e[38;5;$1m%}"
-  echo "${STYLE_A}$3${STYLE_B}%{\e[0m%}"
+  local PREFIX
+  [[ $FIRST -ne 1 ]] && PREFIX="" || PREFIX=""
+  echo "%{\e[48;5;$1m%}$PREFIX%{\e[38;5;$2m%}$3%{\e[38;5;$1m%}"
 }
 
 rprompt_segment() {
@@ -113,18 +106,14 @@ rprompt_segment() {
   echo "${STYLE_B}${STYLE_A}$3"
 }
 
-rprompt_end() {
-  # echo "%{\e[0m%}"
-}
-
 prompt_venv() {
   if [[ -n $VIRTUAL_ENV ]]; then
-    prompt_segment $ZSH_COLOR_SECONDARY 255 $ZSH_COLOR_PRIMARY "%{\e[1m%} `basename $VIRTUAL_ENV` %{\e[0m%}"
+    prompt_segment $ZSH_COLOR_SECONDARY 255 "%{\e[1m%} `basename $VIRTUAL_ENV` %{\e[0m%}"
   fi
 }
 
 prompt_user() {
-  prompt_segment $ZSH_COLOR_PRIMARY $ZSH_COLOR_SECONDARY 239 "%{\e[1m%} %n %{\e[0m%}"
+  prompt_segment $ZSH_COLOR_PRIMARY $ZSH_COLOR_SECONDARY "%{\e[1m%} %n %{\e[0m%}"
 }
 
 prompt_path() {
@@ -133,34 +122,45 @@ prompt_path() {
   DISPLAY_PATH="${PWD/#$HOME/~}"
   DISPLAY_PATH="${DISPLAY_PATH/#\//}"
   DISPLAY_PATH="${DISPLAY_PATH//\//$SEPERATOR}"
-  prompt_segment_end 239 255 " $DISPLAY_PATH "
+  prompt_segment 239 255 " $DISPLAY_PATH "
 }
 
 prompt_git() {
-  local BRANCH COLOR
+  local BRANCH BG FG DIRTY
   BRANCH="$(git symbolic-ref HEAD 2>/dev/null)"
   if [[ -n $BRANCH ]]; then
     BRANCH=${BRANCH##refs/heads/}
     BRANCH=${BRANCH:-HEAD}
     eval "git diff-index --quiet HEAD --"
-    [[ $? -ne 0 ]] && COLOR=136 || COLOR=64
-    rprompt_segment 234 $COLOR "  $BRANCH$CHANGES "
+    DIRTY=$?
+    [[ DIRTY -ne 0 ]] && FG=94 || FG=64
+    [[ DIRTY -ne 0 ]] && BG=178 || BG=113
+    prompt_segment $BG $FG "%{\e[1m%}  $BRANCH$CHANGES %{\e[0m%}"
   fi
 }
 
 prompt_result() {
-  if [[ $1 -ne 0 ]]; then
-    rprompt_segment 124 211 " $1 "
+  if [[ $RETVAL -ne 0 ]]; then
+    rprompt_segment 124 211 "%{\e[1m%} $RETVAL "
   fi 
 }
 
 build_prompt() {
-  echo "$(prompt_venv)$(prompt_user)$(prompt_path) "
+  local RES
+  FIRST=1
+  RES="$(prompt_venv)"
+  [[ -n $RES ]] && FIRST=0
+  RES+="$(prompt_user)"
+  FIRST=0
+  RES+="$(prompt_git)$(prompt_path)%{\e[49m%}%{\e[0m%} "
+  echo $RES
 }
 
+RETVAL=0
 build_rprompt() {
+  RETVAL=$?
   local RES
-  RES="$(prompt_git)"
+  RES="$(prompt_result)"
   if [[ -n $RES ]]; then
     RES+="%{\e[0m%}"
   fi
