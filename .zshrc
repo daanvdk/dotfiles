@@ -108,12 +108,14 @@ rprompt_segment() {
 
 prompt_venv() {
   if [[ -n $VIRTUAL_ENV ]]; then
-    prompt_segment $ZSH_COLOR_SECONDARY 255 "%{\e[1m%} `basename $VIRTUAL_ENV` %{\e[0m%}"
+    prompt_segment $ZSH_COLOR_SECONDARY 255 "%B `basename $VIRTUAL_ENV` %b"
   fi
 }
 
 prompt_user() {
-  prompt_segment $ZSH_COLOR_PRIMARY $ZSH_COLOR_SECONDARY "%{\e[1m%} %n %{\e[0m%}"
+  local VALUE
+  [[ $USER == $DEFAULT_USER ]] && VALUE=" " || VALUE="%B %n %b"
+  prompt_segment $ZSH_COLOR_PRIMARY $ZSH_COLOR_SECONDARY $VALUE
 }
 
 prompt_path() {
@@ -135,7 +137,7 @@ prompt_git() {
     DIRTY=$?
     [[ $DIRTY -ne 0 ]] && FG=94 || FG=64
     [[ $DIRTY -ne 0 ]] && BG=178 || BG=113
-    rprompt_segment $BG $FG "%{\e[1m%}  $BRANCH$CHANGES %{\e[0m%}%{\e[48;5;${BG}m%}"
+    rprompt_segment $BG $FG "%B  $BRANCH$CHANGES %b%{\e[48;5;${BG}m%}"
   fi
 }
 
