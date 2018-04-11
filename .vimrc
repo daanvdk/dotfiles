@@ -22,6 +22,7 @@ Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'vim-airline/vim-airline'
 Plugin 'jmcantrell/vim-virtualenv'
 Plugin 'editorconfig/editorconfig-vim'
+Plugin 'vim-scripts/paredit.vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -41,9 +42,11 @@ filetype plugin indent on    " required
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_powerline_fonts = 1
 let g:airline_section_y = ''
-let g:airline_section_z = '%2l:%2c %2p%%'
+let g:airline_section_z = '%02l:%02c %02p%%'
 let g:airline#extensions#whitespace#enabled = 0
 let g:airline#extensions#virtualenv#enabled = 1
+let g:vim_json_syntax_conceal = 0
+let g:paredit_electric_return = 0
 set laststatus=2
 set number
 syntax on
@@ -52,7 +55,6 @@ colorscheme onedark
 let g:indentLine_char = '▏'
 
 let NERDTreeMinimalUI = 1
-let NERDTreeShowHidden=1
 set fillchars+=vert:\ 
 highlight VertSplit ctermbg=234
 highlight LineNr ctermfg=241
@@ -62,6 +64,7 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 set bs=2
+set nosmartindent
 
 set hidden
 set splitbelow
