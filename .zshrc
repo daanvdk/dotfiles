@@ -120,11 +120,11 @@ prompt_user() {
 
 prompt_path() {
   local DISPLAY_PATH SEPERATOR
-  SEPERATOR=" %{\e[38;5;235m%}%{\e[38;5;255m%} "
+  SEPERATOR=" %{\e[38;5;234m%}%{\e[38;5;255m%} "
   DISPLAY_PATH="${PWD/#$HOME/~}"
   DISPLAY_PATH="${DISPLAY_PATH/#\//}"
   DISPLAY_PATH="${DISPLAY_PATH//\//$SEPERATOR}"
-  prompt_segment 239 255 " $DISPLAY_PATH "
+  prompt_segment 238 255 " $DISPLAY_PATH "
 }
 
 prompt_git() {
