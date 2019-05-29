@@ -83,7 +83,6 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-DEFAULT_USER="daanvdk"
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export VIRTUAL_ENV_DISABLE_PROMPT=true
@@ -91,40 +90,20 @@ export ZLE_RPROMPT_INDENT=0
 
 ZSH_COLOR_PRIMARY=38
 ZSH_COLOR_SECONDARY=24
-FIRST=0
 
-prompt_segment() {
-  local PREFIX
-  [[ $FIRST -ne 1 ]] && PREFIX="" || PREFIX=""
-  echo "%{\e[48;5;$1m%}$PREFIX%{\e[38;5;$2m%}$3%{\e[38;5;$1m%}"
-}
 
-rprompt_segment() {
-  local STYLE_A STYLE_B
-  STYLE_A="%{\e[48;5;$1m\e[38;5;$2m%}"
-  STYLE_B="%{\e[38;5;$1m%}"
-  echo "${STYLE_B}${STYLE_A}$3"
+prompt_error() {
+  echo "%F{1}✖ %f"
 }
 
 prompt_venv() {
   if [[ -n $VIRTUAL_ENV ]]; then
-    prompt_segment $ZSH_COLOR_SECONDARY 255 "%B `basename $VIRTUAL_ENV` %b"
+      echo "%B%F{5}(`basename $VIRTUAL_ENV`)%f%b "
   fi
 }
 
-prompt_user() {
-  local VALUE
-  [[ $USER == $DEFAULT_USER ]] && VALUE=" " || VALUE="%B %n %b"
-  prompt_segment $ZSH_COLOR_PRIMARY $ZSH_COLOR_SECONDARY $VALUE
-}
-
 prompt_path() {
-  local DISPLAY_PATH SEPERATOR
-  SEPERATOR=" %{\e[38;5;234m%}%{\e[38;5;255m%} "
-  DISPLAY_PATH="${PWD/#$HOME/~}"
-  DISPLAY_PATH="${DISPLAY_PATH/#\//}"
-  DISPLAY_PATH="${DISPLAY_PATH//\//$SEPERATOR}"
-  prompt_segment 238 255 " $DISPLAY_PATH "
+  echo "%F{4}%B%~ %b%f"
 }
 
 prompt_git() {
@@ -133,11 +112,10 @@ prompt_git() {
   if [[ -n $BRANCH ]]; then
     BRANCH=${BRANCH##refs/heads/}
     BRANCH=${BRANCH:-HEAD}
-    eval "git diff-index --quiet HEAD --"
+    eval "git diff-index --quiet HEAD -- 2>/dev/null"
     DIRTY=$?
-    [[ $DIRTY -ne 0 ]] && FG=94 || FG=64
-    [[ $DIRTY -ne 0 ]] && BG=178 || BG=113
-    rprompt_segment $BG $FG "%B  $BRANCH$CHANGES %b%{\e[48;5;${BG}m%}"
+    [[ $DIRTY -ne 0 ]] && FG=3 || FG=2
+    echo "%F{$FG}%B( $BRANCH$CHANGES)%b%f"
   fi
 }
 
@@ -145,31 +123,25 @@ RETVAL=0
 
 build_prompt() {
   RETVAL=$?
-  [[ $RETVAL -ne 0 ]] && ZSH_COLOR_PRIMARY=161 || ZSH_COLOR_PRIMARY=38
-  [[ $RETVAL -ne 0 ]] && ZSH_COLOR_SECONDARY=53 || ZSH_COLOR_SECONDARY=24
   local RES
-  FIRST=1
+  [[ $RETVAL -ne 0 ]] && RES+="$(prompt_error)"
   RES+="$(prompt_venv)"
-  [[ -n $RES ]] && FIRST=0 || FIRST=1
-  RES+="$(prompt_user)"
-  FIRST=0
-  RES+="$(prompt_path)%{\e[49m%}%{\e[0m%} "
+  RES+="$(prompt_path)» "
   echo $RES
 }
 
 build_rprompt() {
-  RETVAL=$?
-  [[ $RETVAL -ne 0 ]] && ZSH_COLOR_PRIMARY=161 || ZSH_COLOR_PRIMARY=38
-  [[ $RETVAL -ne 0 ]] && ZSH_COLOR_SECONDARY=53 || ZSH_COLOR_SECONDARY=24
-  local RES
-  RES="$(prompt_git)"
-  if [[ -n $RES ]]; then
-    RES+="%{\e[0m%}"
-  fi
-  echo $RES
+    echo "$(prompt_git)"
 }
 
 setopt prompt_subst
 
 PROMPT='$(build_prompt)'
 RPROMPT='$(build_rprompt)'
+export PATH="/usr/local/sbin:$PATH"
+
+export PYENV_ROOT=/usr/local/var/pyenv
+if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
+
+alias vim="nvim"
+alias vi="nvim"
