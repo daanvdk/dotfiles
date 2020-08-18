@@ -13,10 +13,8 @@ Plug 'vim-airline/vim-airline'
 Plug 'w0rp/ale'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'joshdick/onedark.vim'
-
-" JSX editing
 Plug 'pangloss/vim-javascript'
-Plug 'mxw/vim-jsx'
+Plug 'MaxMEllon/vim-jsx-pretty'
 
 call plug#end()
 
@@ -40,6 +38,8 @@ set expandtab
 set softtabstop=4
 set bs=2
 set nosmartindent
+
+autocmd Filetype elm setlocal expandtab tabstop=2 shiftwidth=2 softtabstop=2
 
 " sensible splits
 set splitbelow
@@ -78,9 +78,17 @@ filetype plugin indent on
 syntax on
 
 hi EndOfBuffer ctermfg=bg guifg=bg
-set guicursor=n:block-CursorNormal,i:hor10-CursorInsert,v:block-CursorVisual
 hi VertSplit ctermfg=8
+set guicursor=n:block-CursorNormal,i:hor10-CursorInsert,v:block-CursorVisual
 set fillchars+=vert:\│
+
+hi link jsxComponentName jsxTagName
+hi link jsxPunct Comment
+hi link jsxDot jsxPunct
+hi link jsxNamespace jsxPunct
+hi link jsxCloseString jsxPunct
+hi link jsxBraces Variable
+hi link jsxEqual jsxBraces
 
 set clipboard=unnamed
 

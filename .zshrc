@@ -145,3 +145,5 @@ if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 
 alias vim="nvim"
 alias vi="nvim"
+
+eval $(thefuck --alias)
