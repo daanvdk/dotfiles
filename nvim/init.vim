@@ -15,6 +15,9 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'joshdick/onedark.vim'
 Plug 'pangloss/vim-javascript'
 Plug 'MaxMEllon/vim-jsx-pretty'
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'yarn install',
+  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
 
 call plug#end()
 

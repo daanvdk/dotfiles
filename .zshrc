@@ -140,9 +140,6 @@ PROMPT='$(build_prompt)'
 RPROMPT='$(build_rprompt)'
 export PATH="/usr/local/sbin:$PATH"
 
-export PYENV_ROOT=/usr/local/var/pyenv
-if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
-
 alias vim="nvim"
 alias vi="nvim"
 
