@@ -35,6 +35,8 @@ call plug#begin("~/.vim/plugged")
     Plug 'Shougo/defx.nvim'
     Plug 'kristijanhusak/defx-git'
     Plug 'kristijanhusak/defx-icons'
+
+    Plug 'lukas-reineke/indent-blankline.nvim'
 call plug#end()
 
 " Config Section
@@ -51,7 +53,11 @@ function! s:defx_my_settings() abort
     nnoremap <silent><buffer><expr> <cr>
     \ defx#is_directory()
     \ ? defx#do_action('open_directory')
-    \ : defx#do_action('multi', ['drop', 'quit'])
+    \ : defx#do_action('multi', ['drop', 'quit']))
+    nnoremap <silent><buffer><expr> v
+    \ defx#is_directory()
+    \ ? defx#do_action('open_directory')
+    \ : defx#do_action('multi', [['drop', ':vsplit'], 'quit'])
     nnoremap <silent><buffer><expr> c
     \ defx#do_action('copy')
     nnoremap <silent><buffer><expr> m
@@ -59,6 +65,8 @@ function! s:defx_my_settings() abort
     nnoremap <silent><buffer><expr> p
     \ defx#do_action('paste')
     nnoremap <silent><buffer><expr> n
+    \ defx#do_action('new_file')
+    nnoremap <silent><buffer><expr> a
     \ defx#do_action('new_file')
     nnoremap <silent><buffer><expr> d
     \ defx#do_action('remove')
@@ -131,7 +139,6 @@ set number
 set colorcolumn=80
 colorscheme onedark
 
-filetype plugin indent on
 syntax on
 
 set guicursor=n:block-CursorNormal,i:hor10-CursorInsert,v:block-CursorVisual
@@ -152,9 +159,7 @@ hi LspDiagnosticsDefaultWarning guifg=#e5c07b
 hi LspDiagnosticsDefaultError guifg=#e06c75
 hi LspDiagnosticsDefaultHint guifg=#c678dd
 hi LspDiagnosticsDefaultInformation guifg=#61afef
-
-" ranger config
-let g:rnvimr_enable_picker = 1
+hi IndentBlanklineChar guifg=#363c48
 
 " copy/paste
 set clipboard=unnamed
@@ -201,7 +206,6 @@ let g:compe.source = {
 lua <<EOF
     require 'nvim-treesitter.configs'.setup {
         highlight = { enable = true },
-        indent = { enable = true }
     }
 EOF
 
@@ -218,3 +222,6 @@ let g:gitgutter_sign_modified_removed = '▌'
 set termguicolors
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+
+" indent line
+let g:indent_blankline_show_trailing_blankline_indent = v:false
