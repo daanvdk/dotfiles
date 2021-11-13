@@ -5,6 +5,7 @@ if status is-interactive
     set fish_color_param white
     set fish_color_operator white
     set fish_color_error --bold red
+    set fish_color_quote blue
 
     abbr -a ts tmux new -s
     abbr -a tl tmux ls

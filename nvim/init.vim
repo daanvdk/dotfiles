@@ -185,9 +185,12 @@ lua << EOF
         vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
     end
 
+    local custom_onedark = require'lualine.themes.onedark'
+    custom_onedark.normal.c.bg = '#282c34'
+    custom_onedark.inactive.c.bg = '#282c34'
     require 'lualine'.setup {
         options = {
-            theme = 'onedark'
+            theme = custom_onedark
         }
     }
 EOF
