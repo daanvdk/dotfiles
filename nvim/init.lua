@@ -15,6 +15,7 @@ Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-cmdline'
 Plug 'hrsh7th/nvim-cmp'
+Plug 'onsails/lspkind-nvim'
 
 -- Dependencies
 Plug 'nvim-lua/popup.nvim'
@@ -141,10 +142,20 @@ vim.api.nvim_set_keymap('n', '<leader>fh', '<cmd>Telescope help_tags<cr>', { nor
 -- Defx shortcuts
 vim.api.nvim_set_keymap('n', '<leader>bb', '<cmd>Defx `escape(expand(\'%:p:h\'), \' :\')` -search=`expand(\'%:p\')`<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<leader>br', '<cmd>Defx `escape(getcwd(), \' :\')`<cr>', { noremap = true })
+-- LSP
+vim.api.nvim_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', { noremap = true })
 
 -- Remap * in visual mode to search for the current selection instead of
 -- current word since current word already works in normal mode anyway
 vim.api.nvim_set_keymap('x', '*', '"zy<Esc>/\\V<C-R>z<cr>', { noremap = true })
+
+-- Get rid of annoying hard to exit modes that happen on typos of :q
+vim.api.nvim_set_keymap('n', 'q:', '', { noremap = true })
+vim.api.nvim_set_keymap('n', 'Q', '', { noremap = true })
 
 -- visual config
 vim.o.number = true
@@ -169,6 +180,10 @@ hi LspDiagnosticsDefaultWarning guifg=#e5c07b
 hi LspDiagnosticsDefaultError guifg=#e06c75
 hi LspDiagnosticsDefaultHint guifg=#c678dd
 hi LspDiagnosticsDefaultInformation guifg=#61afef
+hi! LspDiagnosticsUnderlineWarning gui=undercurl guisp=#e5c07b
+hi! LspDiagnosticsUnderlineError gui=undercurl guisp=#e06c75
+hi! LspDiagnosticsUnderlineHint gui=undercurl guisp=#c678dd
+hi! LspDiagnosticsUnderlineInformation gui=undercurl guisp=#61afef
 hi IndentBlanklineChar guifg=#363c48
 ]])
 
@@ -183,11 +198,35 @@ vim.o.splitbelow = true
 vim.o.splitright = true
 
 -- Setup lsp
-require 'lspconfig'.pylsp.setup {
-    configurationSources = { 'flake8' },
-    flake8 = { enabled = true }
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+	vim.lsp.diagnostic.on_publish_diagnostics, {
+		virtual_text = false,
+		underline = true,
+		signs = true,
+	}
+)
+vim.cmd([[
+autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics({ focusable = false })
+autocmd CursorHoldI * silent! lua vim.lsp.buf.signature_help({ focusable = false })
+]])
+
+local servers = {
+    pylsp = {
+        configurationSources = { 'flake8' },
+        flake8 = { enabled = true }
+    },
+    tsserver = {},
 }
-require 'lspconfig'.tsserver.setup {}
+
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local lspconfig = require 'lspconfig'
+for server, extra_config in pairs(servers) do
+    local config = { capabilities = capabilities }
+    for k, v in pairs(extra_config) do
+        config[k] = v
+    end
+    lspconfig[server].setup(config)
+end
 
 local signs = { Error = '', Warning = '', Hint = '', Information = '' }
 for type, icon in pairs(signs) do
@@ -201,8 +240,16 @@ custom_onedark.normal.c.bg = '#282c34'
 custom_onedark.inactive.c.bg = '#282c34'
 require 'lualine'.setup {
     options = {
-        theme = custom_onedark
-    }
+        theme = 'onedark',
+    },
+      sections = {
+        lualine_a = {'mode'},
+        lualine_b = {'branch', {'diagnostics', sources={'nvim_lsp'}}},
+        lualine_c = {'filename'},
+        lualine_x = {'encoding', 'fileformat', 'filetype'},
+        lualine_y = {'progress'},
+        lualine_z = {'location'}
+    },
 }
 
 -- Setup autocomplete
@@ -226,7 +273,10 @@ cmp.setup({
         { name = 'nvim_lsp' },
     }, {
         { name = 'buffer' },
-    })
+    }),
+    formatting = {
+        format = require'lspkind'.cmp_format({with_text = false, maxwidth = 50}),
+    },
 })
 
 -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
@@ -245,15 +295,6 @@ cmp.setup.cmdline(':', {
     })
 })
 
--- Setup lspconfig for autocomplete
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-require('lspconfig')['pylsp'].setup {
-    capabilities = capabilities
-}
-require('lspconfig')['tsserver'].setup {
-    capabilities = capabilities
-}
-
 -- Setup treesitter
 require 'nvim-treesitter.configs'.setup {
     highlight = { enable = true },
@@ -264,11 +305,6 @@ vim.o.updatetime = 250
 vim.g.gitgutter_sign_added = '▌'
 vim.g.gitgutter_sign_modified = '▌'
 vim.g.gitgutter_sign_modified_removed = '▌'
-
--- Color shite
-vim.o.termguicolors = true
-vim.g['&t_8f'] = '\\<Esc>[38;2;%lu;%lu;%lum'
-vim.g['&t_8b'] = '\\<Esc>[48;2;%lu;%lu;%lum'
 
 -- indent line
 vim.g.indent_blankline_show_trailing_blankline_indent = false
