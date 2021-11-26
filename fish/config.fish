@@ -30,6 +30,8 @@ if status is-interactive
     alias vi=nvim
     alias vim=nvim
 
+    alias ssh="TERM=xterm /usr/bin/ssh"
+
     fish_vi_key_bindings
     starship init fish | source
 end
