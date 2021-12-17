@@ -5,7 +5,6 @@ vim.call('plug#begin', '~/.vim/plugged')
 
 Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate'})
 Plug 'nvim-treesitter/playground'
-
 Plug 'tpope/vim-surround'
 
 Plug 'neovim/nvim-lspconfig'
@@ -244,7 +243,7 @@ require 'lualine'.setup {
     },
       sections = {
         lualine_a = {'mode'},
-        lualine_b = {'branch', {'diagnostics', sources={'nvim_lsp'}}},
+        lualine_b = {'branch', {'diagnostics', sources={'nvim_diagnostic'}}},
         lualine_c = {'filename'},
         lualine_x = {'encoding', 'fileformat', 'filetype'},
         lualine_y = {'progress'},
@@ -267,7 +266,6 @@ cmp.setup({
             i = cmp.mapping.abort(),
             c = cmp.mapping.close(),
         }),
-        ['<CR>'] = cmp.mapping.confirm({ select = true }),
     },
     sources = cmp.config.sources({
         { name = 'nvim_lsp' },
