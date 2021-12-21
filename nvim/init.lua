@@ -21,6 +21,7 @@ Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 -- Telescope
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-file-browser.nvim'
 
 Plug 'editorconfig/editorconfig-vim'	
 
@@ -39,74 +40,11 @@ Plug 'airblade/vim-gitgutter'
 Plug 'f-person/git-blame.nvim'
 Plug 'tpope/vim-commentary'
 
-Plug 'Shougo/defx.nvim'
-Plug 'kristijanhusak/defx-git'
-Plug 'kristijanhusak/defx-icons'
-
 Plug 'lukas-reineke/indent-blankline.nvim'
 
 vim.call('plug#end')
 
 -- Config Section
-
--- Defx
--- This is still in vimscript since autocmd is not supported yet in lua
-vim.cmd([[
-autocmd FileType defx call Defx_my_settings()
-
-function! Defx_my_settings() abort
-    nnoremap <silent><buffer><expr> l
-    \ defx#is_directory()
-    \ ? defx#do_action('open_directory')
-    \ : defx#do_action('multi', ['drop', 'quit'])
-    nnoremap <silent><buffer><expr> <cr>
-    \ defx#is_directory()
-    \ ? defx#do_action('open_directory')
-    \ : defx#do_action('multi', ['drop', 'quit']))
-    nnoremap <silent><buffer><expr> v
-    \ defx#is_directory()
-    \ ? defx#do_action('open_directory')
-    \ : defx#do_action('multi', [['drop', ':vsplit'], 'quit'])
-    nnoremap <silent><buffer><expr> c
-    \ defx#do_action('copy')
-    nnoremap <silent><buffer><expr> m
-    \ defx#do_action('move')
-    nnoremap <silent><buffer><expr> p
-    \ defx#do_action('paste')
-    nnoremap <silent><buffer><expr> n
-    \ defx#do_action('new_file')
-    nnoremap <silent><buffer><expr> a
-    \ defx#do_action('new_file')
-    nnoremap <silent><buffer><expr> d
-    \ defx#do_action('remove')
-    nnoremap <silent><buffer><expr> r
-    \ defx#do_action('rename')
-    nnoremap <silent><buffer><expr> .
-    \ defx#do_action('toggle_ignored_files')
-    nnoremap <silent><buffer><expr> h
-    \ defx#do_action('cd', ['..'])
-    nnoremap <silent><buffer><expr> ~
-    \ defx#do_action('cd')
-    nnoremap <silent><buffer><expr> q
-    \ defx#do_action('quit')
-    nnoremap <silent><buffer><expr> <esc>
-    \ defx#do_action('quit')
-    nnoremap <silent><buffer><expr> j
-    \ line('.') == line('$') ? 'gg' : 'j'
-    nnoremap <silent><buffer><expr> k
-    \ line('.') == 1 ? 'G' : 'k'
-endfunction
-
-call defx#custom#option('_', {
-    \ 'split': 'floating',
-    \ 'wincol': '15',
-    \ 'winrow': '9',
-    \ 'winwidth': &columns - 30,
-    \ 'winheight': &lines - 18,
-    \ 'winborder': 'single',
-    \ 'columns': 'mark:indent:git:space:icons:space:filename',
-    \ })
-]])
 
 -- tab config
 vim.o.tabstop = 4
@@ -115,6 +53,9 @@ vim.o.expandtab = true
 vim.o.softtabstop = 4
 vim.o.backspace = 'indent,eol,start'
 vim.o.smartindent = false
+
+-- Telescope
+require("telescope").load_extension "file_browser"
 
 -- key remappings
 vim.g.mapleader = ' '
@@ -136,11 +77,8 @@ vim.api.nvim_set_keymap('n', '<C-l>', '<C-\\><C-N><C-w>l', { noremap = true })
 -- Telescope shortcuts
 vim.api.nvim_set_keymap('n', '<leader>ff', '<cmd>Telescope find_files<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<leader>fg', '<cmd>Telescope live_grep<cr>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<leader>fb', '<cmd>Telescope buffers<cr>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<leader>fh', '<cmd>Telescope help_tags<cr>', { noremap = true })
--- Defx shortcuts
-vim.api.nvim_set_keymap('n', '<leader>bb', '<cmd>Defx `escape(expand(\'%:p:h\'), \' :\')` -search=`expand(\'%:p\')`<cr>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<leader>br', '<cmd>Defx `escape(getcwd(), \' :\')`<cr>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>bb', '<cmd>lua require "telescope".extensions.file_browser.file_browser({ path = vim.fn.expand("%:p:h") })<cr>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>br', '<cmd>lua require "telescope".extensions.file_browser.file_browser()<cr>', { noremap = true })
 -- LSP
 vim.api.nvim_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', { noremap = true })
 vim.api.nvim_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', { noremap = true })
@@ -296,6 +234,7 @@ cmp.setup.cmdline(':', {
 -- Setup treesitter
 require 'nvim-treesitter.configs'.setup {
     highlight = { enable = true },
+    indent = { enable = true },
 }
 
 -- Gitgutter

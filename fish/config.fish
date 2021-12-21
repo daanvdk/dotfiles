@@ -37,3 +37,5 @@ if status is-interactive
 end
 
 thefuck --alias | source
+
+set PATH "/Users/daan/Library/Python/3.9/bin:$PATH"
