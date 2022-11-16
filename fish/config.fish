@@ -19,13 +19,16 @@ if status is-interactive
     abbr -a gl git log
     abbr -a gd git diff
     abbr -a ga git add
+    abbr -a gaa git add --all
     abbr -a gc git commit
     abbr -a gch git checkout
     abbr -a gpl git pull
     abbr -a gps git push
     abbr -a gm git merge
 
-    abbr -a dc docker-compose
+    abbr -a dc docker compose
+
+    abbr -a gro 'git fetch origin && git reset --hard origin/(git rev-parse --abbrev-ref HEAD)'
 
     alias vi=nvim
     alias vim=nvim
