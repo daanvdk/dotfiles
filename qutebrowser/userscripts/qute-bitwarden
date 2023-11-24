@@ -1,0 +1,361 @@
+#!/Users/daan/Projects/dotfiles/qutebrowser/userscripts/.venv/bin/python
+# SPDX-FileCopyrightText: Chris Braun (cryzed) <cryzed@googlemail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+"""
+Insert login information using Bitwarden CLI and a dmenu-compatible application
+(e.g. dmenu, rofi -dmenu, ...).
+"""
+
+USAGE = """The domain of the site has to be in the name of the Bitwarden entry, for example: "github.com/cryzed" or
+"websites/github.com".  The login information is inserted by emulating key events using qutebrowser's fake-key command in this manner:
+[USERNAME]<Tab>[PASSWORD], which is compatible with almost all login forms.
+
+If enabled, with the `--totp` flag, it will also move the TOTP code to the
+clipboard, much like the Firefox add-on.
+
+You must log into Bitwarden CLI using `bw login` prior to use of this script.
+The session key will be stored using keyctl for the number of seconds passed to
+the --auto-lock option.
+
+To use in qutebrowser, run: `spawn --userscript qute-bitwarden`
+"""
+
+EPILOG = """Dependencies: tldextract (Python 3 module), pyperclip (optional
+Python module, used for TOTP codes), Bitwarden CLI (1.7.4 is known to work
+but older versions may well also work)
+
+WARNING: The login details are viewable as plaintext in qutebrowser's debug log
+(qute://log) and might be shared if you decide to submit a crash report!"""
+
+import argparse
+import enum
+import functools
+import getpass
+import os
+import osascript
+import shlex
+import subprocess
+import sys
+import time
+import json
+import tldextract
+import nacl.secret
+import nacl.utils
+from pathlib import Path
+
+argument_parser = argparse.ArgumentParser(
+    description=__doc__,
+    usage=USAGE,
+    epilog=EPILOG,
+)
+argument_parser.add_argument('url', nargs='?', default=os.getenv('QUTE_URL'))
+argument_parser.add_argument('--insert-mode', action='store_true',
+                             help="Don't automatically enter insert mode")
+argument_parser.add_argument('--totp', '-t', action='store_true',
+                             help="Copy TOTP key to clipboard")
+argument_parser.add_argument('--io-encoding', '-i', default='UTF-8',
+                             help='Encoding used to communicate with subprocesses')
+argument_parser.add_argument('--merge-candidates', '-m', action='store_true',
+                             help='Merge pass candidates for fully-qualified and registered domain name')
+argument_parser.add_argument('--force-master-password',
+                             action='store_true', help='Always ask for master password')
+group = argument_parser.add_mutually_exclusive_group()
+group.add_argument('--username-only', '-e',
+                   action='store_true', help='Only insert username')
+group.add_argument('--password-only', '-w',
+                   action='store_true', help='Only insert password')
+group.add_argument('--totp-only', '-T',
+                   action='store_true', help='Only insert totp code')
+
+stderr = functools.partial(print, file=sys.stderr)
+
+
+class ExitCodes(enum.IntEnum):
+    SUCCESS = 0
+    FAILURE = 1
+    # 1 is automatically used if Python throws an exception
+    NO_PASS_CANDIDATES = 2
+    COULD_NOT_MATCH_USERNAME = 3
+    COULD_NOT_MATCH_PASSWORD = 4
+
+
+def qute_command(command):
+    with open(os.environ['QUTE_FIFO'], 'w') as fifo:
+        fifo.write(command + '\n')
+        fifo.flush()
+
+
+OSA_SHOULD_ESCAPE = '\\"'
+
+
+def osastring(rawstring):
+    chars = ['"']
+    for rawchar in rawstring:
+        if rawchar in OSA_SHOULD_ESCAPE:
+            chars.append('\\')
+        chars.append(rawchar)
+    chars.append('"')
+    return ''.join(chars)
+
+
+def get_env():
+    return {
+        **os.environ,
+        'PATH': '/usr/local/bin:' + os.environ['PATH'],
+    }
+
+
+def ask_password():
+    _, out, err = osascript.run(
+        f'Tell application "System Events" to display dialog "Master Password" with hidden answer default answer ""'
+    )
+
+    if err:
+        raise Exception('Could not unlock vault')
+
+    last_semicolon_index = out.rfind(':')
+    password = out[last_semicolon_index + 1:]
+
+    bitwarden_process = subprocess.Popen(
+        ['bw', 'unlock', '--raw', '--passwordfile', '/dev/stdin'],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        env=get_env(),
+    )
+
+    session_key, _ = bitwarden_process.communicate(password.encode())
+
+    if bitwarden_process.returncode > 0:
+        raise Exception(f'Some error ocurred when unlocking vault. Might be wrong password: {bitwarden_process.returncode}')
+
+    return session_key.decode().strip()
+
+
+def time_s():
+    return time.time_ns() // 1_000_000_000
+
+
+class NoEncryptionBox(Exception):
+    pass
+
+
+def get_encryption_box():
+    current_user = getpass.getuser()
+    process = subprocess.Popen(
+        ['security', 'find-generic-password', '-a', current_user, '-s', 'qute_bitwarden_key', '-w'],
+        stdout=subprocess.PIPE,
+    )
+    output, _ = process.communicate()
+
+    if process.returncode > 0:
+        raise NoEncryptionBox
+
+    key = bytes.fromhex(output.decode())
+    return nacl.secret.SecretBox(key)
+
+
+def new_encryption_box():
+    key = nacl.utils.random(nacl.secret.SecretBox.KEY_SIZE)
+    current_user = getpass.getuser()
+    subprocess.run(['security', 'add-generic-password', '-U', '-a', current_user, '-s', 'qute_bitwarden_key', '-w', key.hex()])
+    return nacl.secret.SecretBox(key)
+
+
+SESSION_PATH = Path('/tmp/qute-bitwarden-session')
+
+
+def get_session_key(force_master_password):
+    if force_master_password:
+        return new_session_key()
+    try:
+        session_data = SESSION_PATH.read_bytes()
+        encryption_box = get_encryption_box()
+    except (FileNotFoundError, NoEncryptionBox):
+        return new_session_key()
+    else:
+        return encryption_box.decrypt(session_data).decode()
+
+
+def new_session_key():
+    session = ask_password()
+    encryption_box = new_encryption_box()
+    SESSION_PATH.write_bytes(encryption_box.encrypt(session.encode()))
+    return session
+
+
+def pass_(domain, encoding, force_master_password):
+    session_key = get_session_key(force_master_password)
+    process = subprocess.run(
+        ['bw', 'list', 'items', '--session', session_key, '--url', domain],
+        capture_output=True,
+        env=get_env(),
+    )
+
+    err = process.stderr.decode(encoding).strip()
+    if err:
+        msg = 'Bitwarden CLI returned for {:s} - {:s}'.format(domain, err)
+        stderr(msg)
+
+    if process.returncode:
+        return '[]'
+
+    out = process.stdout.decode(encoding).strip()
+
+    return out
+
+
+def get_totp_code(selection_id, domain_name, encoding, force_master_password):
+    session_key = get_session_key(force_master_password)
+    process = subprocess.run(
+        ['bw', 'get', 'totp', '--session', session_key, selection_id],
+        capture_output=True,
+        env=get_env(),
+    )
+
+    err = process.stderr.decode(encoding).strip()
+    if err:
+        # domain_name instead of selection_id to make it more user-friendly
+        msg = 'Bitwarden CLI returned for {:s} - {:s}'.format(domain_name, err)
+        stderr(msg)
+
+    if process.returncode:
+        return '[]'
+
+    out = process.stdout.decode(encoding).strip()
+
+    return out
+
+
+def choose(items, encoding):
+    process = subprocess.run(
+        ['choose'],
+        input='\n'.join(items).encode(encoding),
+        stdout=subprocess.PIPE,
+        env=get_env(),
+    )
+    return process.stdout.decode(encoding).strip()
+
+
+def fake_key_raw(text):
+    for character in text:
+        # Escape all characters by default, space requires special handling
+        sequence = '" "' if character == ' ' else r'\{}'.format(character)
+        qute_command('fake-key {}'.format(sequence))
+
+
+def focus_username():
+    qute_command('jseval document.hasFocus() || document.querySelector(\'input[name="email"], input[name="username"], input[name="user"], input[name="name"]\').focus()')
+
+
+def focus_password():
+    qute_command('jseval document.hasFocus() || document.querySelector(\'input[name="password"], input[name="pass"]\').focus()')
+
+
+def main(arguments):
+    if not arguments.url:
+        argument_parser.print_help()
+        return ExitCodes.FAILURE
+
+    extract_result = tldextract.extract(arguments.url)
+
+    # Try to find candidates using targets in the following order: fully-qualified domain name (includes subdomains),
+    # the registered domain name and finally: the IPv4 address if that's what
+    # the URL represents
+    candidates = []
+    for target in filter(None, [
+                extract_result.fqdn,
+                extract_result.registered_domain,
+                extract_result.subdomain + '.' + extract_result.domain,
+                extract_result.domain,
+                extract_result.ipv4]):
+        target_candidates = json.loads(
+            pass_(
+                target,
+                arguments.io_encoding,
+                arguments.force_master_password,
+            )
+        )
+        if not target_candidates:
+            continue
+
+        candidates = candidates + target_candidates
+        if not arguments.merge_candidates:
+            break
+    else:
+        if not candidates:
+            stderr('No pass candidates for URL {!r} found!'.format(
+                arguments.url))
+            return ExitCodes.NO_PASS_CANDIDATES
+
+    if len(candidates) == 1:
+        selection = candidates.pop()
+    else:
+        choices = ['{:s} | {:s}'.format(c['name'], c['login']['username']) for c in candidates]
+        choice = choose(choices, arguments.io_encoding)
+        choice_tokens = choice.split('|')
+        choice_name = choice_tokens[0].strip()
+        choice_username = choice_tokens[1].strip()
+        selection = next((c for (i, c) in enumerate(candidates)
+                          if c['name'] == choice_name
+                          and c['login']['username'] == choice_username),
+                         None)
+
+    # Nothing was selected, simply return
+    if not selection:
+        return ExitCodes.SUCCESS
+
+    username = selection['login']['username']
+    password = selection['login']['password']
+    totp = selection['login']['totp']
+
+    if arguments.username_only:
+        focus_username()
+        fake_key_raw(username)
+    elif arguments.password_only:
+        focus_password()
+        fake_key_raw(password)
+    elif arguments.totp_only:
+        # No point in moving it to the clipboard in this case
+        fake_key_raw(
+            get_totp_code(
+                selection['id'],
+                selection['name'],
+                arguments.io_encoding,
+                arguments.force_master_password,
+            )
+        )
+    else:
+        # Enter username and password using fake-key and <Tab> (which seems to work almost universally), then switch
+        # back into insert-mode, so the form can be directly submitted by
+        # hitting enter afterwards
+        focus_username()
+        fake_key_raw(username)
+        qute_command('fake-key <Tab>')
+        fake_key_raw(password)
+        qute_command('fake-key <Enter>')
+
+    if arguments.insert_mode:
+        qute_command('mode-enter insert')
+
+    # If it finds a TOTP code, it copies it to the clipboard,
+    # which is the same behavior as the Firefox add-on.
+    if not arguments.totp_only and totp and arguments.totp:
+        # The import is done here, to make pyperclip an optional dependency
+        import pyperclip
+        pyperclip.copy(
+            get_totp_code(
+                selection['id'],
+                selection['name'],
+                arguments.io_encoding,
+                arguments.force_master_password,
+            )
+        )
+
+    return ExitCodes.SUCCESS
+
+
+if __name__ == '__main__':
+    arguments = argument_parser.parse_args()
+    sys.exit(main(arguments))

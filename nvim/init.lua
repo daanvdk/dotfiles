@@ -4,6 +4,7 @@ local Plug = vim.fn['plug#']
 vim.call('plug#begin', '~/.vim/plugged')
 
 Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate'})
+Plug 'nvim-treesitter/nvim-treesitter-textobjects'
 Plug 'nvim-treesitter/playground'
 Plug 'tpope/vim-surround'
 
@@ -31,9 +32,6 @@ Plug 'kyazdani42/nvim-web-devicons'
 
 Plug 'navarasu/onedark.nvim'
 
-Plug 'pangloss/vim-javascript'
-Plug 'MaxMEllon/vim-jsx-pretty'
-
 Plug 'tpope/vim-fugitive'
 
 Plug 'airblade/vim-gitgutter'
@@ -44,6 +42,7 @@ Plug 'tpope/vim-commentary'
 Plug 'lukas-reineke/indent-blankline.nvim'
 
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'https://git.sr.ht/~whynothugo/lsp_lines.nvim'
 
 vim.call('plug#end')
 
@@ -56,11 +55,21 @@ vim.o.expandtab = true
 vim.o.softtabstop = 4
 vim.o.backspace = 'indent,eol,start'
 vim.o.smartindent = false
+vim.o.mouse = ''
 vim.o.cmdheight = 0
+vim.g.gitgutter_show_msg_on_hunk_jumping = 0
 
 -- Telescope
 local actions = require "telescope.actions"
 local fb_actions = require "telescope".extensions.file_browser.actions
+local action_state = require("telescope.actions.state")
+
+function dir_to_grep()
+    local entry = action_state.get_selected_entry()
+    opts = { cwd = entry.path or entry.filename }
+    actions.close()
+    require("telescope.builtins").live_grep(opts)
+end
 
 require "telescope".setup {
     defaults = {
@@ -85,6 +94,7 @@ require "telescope".setup {
                     ["<C-w>"] = fb_actions.goto_cwd,
                     ["<C-h>"] = fb_actions.toggle_hidden,
                     ["<C-s>"] = fb_actions.toggle_all,
+                    ["<C-f>"] = dir_to_grep,
                 },
             },
         },
@@ -101,11 +111,17 @@ vim.api.nvim_set_keymap('n', '<leader>ff', '<cmd>lua require "telescope.builtin"
 vim.api.nvim_set_keymap('n', '<leader>fg', '<cmd>lua require "telescope.builtin".live_grep()<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<leader>bb', '<cmd>lua require "telescope".extensions.file_browser.file_browser({ path = vim.fn.expand("%:p:h") })<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<leader>br', '<cmd>lua require "telescope".extensions.file_browser.file_browser()<cr>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>d', '<cmd>lua require "telescope.builtin".diagnostics({ bufnr = 0 })<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>c', '<cmd>lua require "telescope.builtin".lsp_document_symbols({symbols = {"class"}})<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>C', '<cmd>lua require "telescope.builtin".lsp_workspace_symbols({symbols = {"class"}})<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>m', '<cmd>lua require "telescope.builtin".lsp_document_symbols({symbols = {"function"}})<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader>M', '<cmd>lua require "telescope.builtin".lsp_workspace_symbols({symbols = {"function"}})<CR>', { noremap = true })
 -- LSP
 vim.api.nvim_set_keymap('n', 'gd', '<cmd>lua require "telescope.builtin".lsp_definitions()<CR>', { noremap = true })
 vim.api.nvim_set_keymap('n', 'gr', '<cmd>lua require "telescope.builtin".lsp_references()<CR>', { noremap = true })
-vim.api.nvim_set_keymap('n', 'gi', '<cmd>lua require "telescope.builtin".diagnostics({ bufnr = 0 })<CR>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '[d', '<cmd>silent lua vim.diagnostic.goto_prev({ float = false })<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', ']d', '<cmd>silent lua vim.diagnostic.goto_next({ float = false })<CR>', { noremap = true })
 
 -- Remap * in visual mode to search for the current selection instead of
 -- current word since current word already works in normal mode anyway
@@ -124,6 +140,9 @@ vim.cmd('syntax on')
 vim.o.guicursor = 'n:block-CursorNormal,i:hor10-CursorInsert,v:block-CursorVisual'
 vim.g.vim_json_syntax_conceal = 0
 
+-- LSP lines
+require("lsp_lines").setup()
+
 -- this is still in vimscript since highlight is not supported yet in lua
 vim.cmd([[
 hi VertSplit ctermfg=8 guifg=#5c6370
@@ -138,6 +157,10 @@ hi LspDiagnosticsDefaultWarning guifg=#e5c07b
 hi LspDiagnosticsDefaultError guifg=#e06c75
 hi LspDiagnosticsDefaultHint guifg=#c678dd
 hi LspDiagnosticsDefaultInformation guifg=#61afef
+hi! link DiagnosticVirtualTextError DiagnosticError
+hi! link DiagnosticVirtualTextWarn DiagnosticWarn
+hi! link DiagnosticVirtualTextInfo DiagnosticInfo
+hi! link DiagnosticVirtualTextHint DiagnosticHint
 hi! LspDiagnosticsUnderlineWarning gui=undercurl guisp=#e5c07b
 hi! LspDiagnosticsUnderlineError gui=undercurl guisp=#e06c75
 hi! LspDiagnosticsUnderlineHint gui=undercurl guisp=#c678dd
@@ -156,32 +179,29 @@ vim.o.splitbelow = true
 vim.o.splitright = true
 
 -- Setup lsp
-vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-	vim.lsp.diagnostic.on_publish_diagnostics, {
-		virtual_text = false,
-		underline = true,
-		signs = true,
-	}
-)
-vim.cmd([[
-autocmd CursorHold * lua vim.diagnostic.open_float({ focusable = false })
-autocmd CursorHoldI * silent! lua vim.lsp.buf.signature_help({ focusable = false })
-]])
-
-local servers = {
-    pylsp = {
-        configurationSources = { 'flake8' },
-        flake8 = { enabled = true }
-    },
-    tsserver = {},
-    zls = {},
-}
-
+vim.diagnostic.config({ virtual_text = false, signs = false })
 navic = require 'nvim-navic'
 
 -- Setup lualine
 local custom_onedark = require 'lualine.themes.onedark'
 custom_onedark.normal.c.fg = custom_onedark.normal.b.fg
+
+local function display_current_macro()
+    local reg = vim.fn.reg_recording()
+    return string.format(" recording %s", reg)
+end
+
+local function show_current_macro()
+    local reg = vim.fn.reg_recording()
+    return reg ~= ''
+end
+
+local current_macro = {
+    display_current_macro,
+    cond = show_current_macro,
+    color = { fg = '#e06c75', gui = 'bold' },
+}
+
 require 'lualine'.setup {
     options = {
         theme = custom_onedark
@@ -194,7 +214,7 @@ require 'lualine'.setup {
             cond=navic.is_available,
             padding={left=1, right=0},
         }},
-        lualine_x = {'progress'},
+        lualine_x = {current_macro, 'progress'},
         lualine_y = {'location'},
         lualine_z = {},
     },
@@ -249,19 +269,6 @@ local on_attach = function(client, bufnr)
     end
 end
 
-local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
-local lspconfig = require 'lspconfig'
-for server, extra_config in pairs(servers) do
-    local config = {
-        capabilities = capabilities,
-        on_attach = on_attach
-    }
-    for k, v in pairs(extra_config) do
-        config[k] = v
-    end
-    lspconfig[server].setup(config)
-end
-
 local signs = { Error = '', Warning = '', Hint = '', Information = '' }
 for type, icon in pairs(signs) do
     local hl = 'LspDiagnosticsSign' .. type
@@ -273,30 +280,31 @@ local cmp = require 'cmp'
 
 vim.o.completeopt = 'menu,menuone,noselect'
 
+local window_opts = {
+    winhighlight = "Normal:Normal,FloatBorder:Comment,CursorLine:Visual,Search:None",
+}
+
 cmp.setup({
     mapping = {
-        ['<C-d>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-        ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
-        ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-        ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
-        ['<C-e>'] = cmp.mapping({
-            i = cmp.mapping.abort(),
-            c = cmp.mapping.close(),
-        }),
-        ['<C-n>'] = function(fallback)
+        ['<C-n>'] = function()
             if cmp.visible() then
-                cmp.select_next_item()
+                local types = require 'cmp.types'
+                cmp.select_next_item({ behavior = types.cmp.SelectBehavior.Insert })
             else
-                fallback()
+                cmp.complete()
             end
         end,
-        ['<C-p>'] = function(fallback)
+        ['<C-p>'] = function()
             if cmp.visible() then
-                cmp.select_prev_item()
+                local types = require 'cmp.types'
+                cmp.select_prev_item({ behavior = types.cmp.SelectBehavior.Insert })
             else
-                fallback()
+                cmp.complete()
             end
         end,
+        ['<C-e>'] = cmp.mapping.abort(),
+        ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-f>'] = cmp.mapping.scroll_docs(4),
     },
     sources = cmp.config.sources({
         { name = 'nvim_lsp' },
@@ -304,7 +312,15 @@ cmp.setup({
         { name = 'buffer' },
     }),
     formatting = {
-        format = require'lspkind'.cmp_format({with_text = false, maxwidth = 50}),
+        fields = { 'kind', 'abbr', 'menu' },
+        format = require('lspkind').cmp_format({ mode = 'symbol' }),
+    },
+    window = {
+        completion = cmp.config.window.bordered(window_opts),
+        documentation = cmp.config.window.bordered(window_opts),
+    },
+    experimental = {
+        ghost_text = true,
     },
 })
 
@@ -324,9 +340,72 @@ cmp.setup.cmdline(':', {
     })
 })
 
+local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+local lspconfig = require 'lspconfig'
+
+local servers = {
+    pylsp = {
+        pylsp = {
+            configurationSources = { 'flake8' },
+            plugins = {
+                flake8 = { enabled = true },
+                mccabe = { enabled = false },
+                pycodestyle = { enabled = false },
+                pyflakes = { enabled = false },
+                pylint = { enabled = false },
+            },
+        },
+    },
+    tsserver = {},
+    zls = {},
+    hls = {},
+}
+for server, settings in pairs(servers) do
+    local config = {
+        capabilities = capabilities,
+        on_attach = on_attach,
+        settings = settings,
+    }
+    lspconfig[server].setup(config)
+end
+
 -- Setup treesitter
 require 'nvim-treesitter.configs'.setup {
     highlight = { enable = true },
+    textobjects = {
+        select = {
+            enable = true,
+            -- Automatically jump forward to textobj, similar to targets.vim 
+            lookahead = true,
+            keymaps = {
+                -- You can use the capture groups defined in textobjects.scm
+                ["af"] = "@function.outer",
+                ["if"] = "@function.inner",
+                ["ac"] = "@class.outer",
+                ["ic"] = "@class.inner",
+            },
+        },
+        move = {
+            enable = true,
+            set_jumps = true, 
+            goto_next_start = {
+                [']m'] = '@function.outer',
+                [']]'] = '@class.outer',
+            },
+            goto_next_end = {
+                [']M'] = '@function.outer',
+                [']['] = '@class.outer',
+            },
+            goto_previous_start = {
+                ['[m'] = '@function.outer',
+                ['[['] = '@class.outer',
+            },
+            goto_previous_end = {
+                ['[M'] = '@function.outer',
+                ['[]'] = '@class.outer',
+            },
+        },
+    },
 }
 
 -- Gitgutter

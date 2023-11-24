@@ -1,17 +1,20 @@
-format = "$directory$character"
-right_format = "$git_branch$git_metrics"
+format = '$python$directory$character'
+right_format = '$git_branch$git_metrics'
 add_newline = false
 
-[character]
-success_symbol = "[»](white)"
-error_symbol = "[»](white)"
-vicmd_symbol = "[ VI ](black bold bg:green)[](green)"
+[python]
+format = '[(\($virtualenv\) )](purple bold)'
 
 [directory]
 truncation_length = 0
 truncate_to_repo = false
 style = "blue bold"
 
+[character]
+success_symbol = '[»](white)'
+error_symbol = '[»](red)'
+vicmd_symbol = '[»](white)'
+
 [git_branch]
-format = "[$symbol$branch]($style)"
+format = '[$symbol$branch]($style)'
 style = "yellow bold"

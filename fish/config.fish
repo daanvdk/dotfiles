@@ -8,6 +8,7 @@ if status is-interactive
     set fish_color_operator white
     set fish_color_error --bold red
     set fish_color_quote blue
+    set fish_cursor_insert underscore
 
     abbr -a ts tmux new -s
     abbr -a tl tmux ls
@@ -25,10 +26,13 @@ if status is-interactive
     abbr -a gpl git pull
     abbr -a gps git push
     abbr -a gm git merge
+    abbr -a gr git rebase -i
+    abbr -a grc git rebase --continue
 
     abbr -a dc docker compose
+    abbr -a dcc 'docker compose -p (basename (pwd))-cypress'
 
-    abbr -a gro 'git fetch origin && git reset --hard origin/(git rev-parse --abbrev-ref HEAD)'
+    abbr -a gro 'git fetch origin (git rev-parse --abbrev-ref HEAD) && git reset --hard origin/(git rev-parse --abbrev-ref HEAD)'
 
     alias vi=nvim
     alias vim=nvim
@@ -41,4 +45,4 @@ end
 
 thefuck --alias | source
 
-set PATH "/Users/daan/Library/Python/3.9/bin:$PATH"
+set PATH "/Users/daan/.local/bin:/usr/local/opt/gnu-sed/libexec/gnubin:/usr/local/opt/coreutils/libexec/gnubin:$PATH"
