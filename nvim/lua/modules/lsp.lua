@@ -8,7 +8,20 @@ end)
 require("mason").setup({})
 require("mason-lspconfig").setup({
   ensure_installed = {},
-  handlers = {lsp_zero.default_setup},
+  handlers = {
+    lsp_zero.default_setup,
+    pylsp = function ()
+      require("lspconfig").pylsp.setup({
+        settings = {
+          pylsp = {
+            configurationSources = {"flake8"},
+            flake8 = {enabled = true},
+            pycodestyle = {enabled = false},
+          },
+        },
+      })
+    end,
+  },
 })
 
 local signs = { Error = "", Warn = "", Hint = "", Info = "" }
@@ -21,5 +34,3 @@ end
 for type, _ in pairs(signs) do
   vim.api.nvim_set_hl(0, "DiagnosticVirtualText" .. type, { link = "Diagnostic" .. type })
 end
-
-vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename)
