@@ -47,8 +47,6 @@ vim.keymap.set("n", "<leader>gl", builtin.git_commits)
 vim.keymap.set("n", "<leader>gs", builtin.git_status)
 vim.keymap.set("n", "<leader>gb", builtin.git_branches)
 
-vim.keymap.set("n", "<leader>gr", builtin.lsp_references)
-
 vim.keymap.set("n", "<leader>br", telescope.extensions.file_browser.file_browser)
 vim.keymap.set("n", "<leader>bb", function ()
   telescope.extensions.file_browser.file_browser({path = "%:p:h", select_buffer = true})
