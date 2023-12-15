@@ -28,6 +28,7 @@ require("lazy").setup({
   'hrsh7th/nvim-cmp',
   "williamboman/mason.nvim",
   "williamboman/mason-lspconfig.nvim",
+  "SmiteshP/nvim-navic",
 
   {"nvim-telescope/telescope.nvim", dependencies = {"nvim-lua/plenary.nvim"}},
   "nvim-telescope/telescope-fzf-native.nvim",
@@ -38,5 +39,5 @@ require("lazy").setup({
   "nvim-treesitter/nvim-treesitter-textobjects",
 
   "nvim-lualine/lualine.nvim",
-  {"akinsho/git-conflict.nvim", version = "*", config = true},
+  {"daanvdk/git-conflict.nvim", version = "*", config = true},
 })

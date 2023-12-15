@@ -3,6 +3,9 @@ local lsp_zero = require("lsp-zero")
 lsp_zero.on_attach(function(client, bufnr)
   lsp_zero.default_keymaps({buffer = bufnr})
   vim.keymap.set('n', 'gr', require("telescope.builtin").lsp_references, {buffer = bufnr})
+  if client.server_capabilities.documentSymbolProvider then
+    require("nvim-navic").attach(client, bufnr)
+  end
 end)
 
 require("mason").setup({})
