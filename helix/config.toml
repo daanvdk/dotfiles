@@ -1,0 +1,15 @@
+theme = "catppuccin_macchiato"
+
+[editor]
+rulers = [80]
+
+[editor.search]
+smart-case = false
+
+[editor.cursor-shape]
+normal = "block"
+insert = "underline"
+select = "block"
+
+[editor.indent-guides]
+render = true

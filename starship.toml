@@ -1,9 +1,6 @@
-format = '$python$directory$character'
+format = '$directory$character'
 right_format = '$git_branch$git_metrics'
 add_newline = false
-
-[python]
-format = '[(\($virtualenv\) )](purple bold)'
 
 [directory]
 truncation_length = 0

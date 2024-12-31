@@ -1,0 +1,7 @@
+[user]
+	name = Daan van der Kallen
+	email = mail@daanvdk.com
+[push]
+	autoSetupRemote = true
+[pull]
+	rebase = interactive
