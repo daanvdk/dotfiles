@@ -5,3 +5,5 @@
 	autoSetupRemote = true
 [pull]
 	rebase = interactive
+[core]
+	editor = hx
