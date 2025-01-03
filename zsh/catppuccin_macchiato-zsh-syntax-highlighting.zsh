@@ -2,7 +2,6 @@
 # Alterations:
 #   - Replaced green (#a6da95) with blue (#8aadf4)
 #   - Made path separators white like the rest of the path instead of red
-#   - Add highlighting for zhs-abbr abbreviations
 
 # Catppuccin Macchiato Theme (for zsh-syntax-highlighting)
 #
@@ -78,10 +77,3 @@ ZSH_HIGHLIGHT_STYLES[redirection]='fg=#cad3f5'
 ZSH_HIGHLIGHT_STYLES[arg0]='fg=#cad3f5'
 ZSH_HIGHLIGHT_STYLES[default]='fg=#cad3f5'
 ZSH_HIGHLIGHT_STYLES[cursor]='fg=#cad3f5'
-
-# Highlight zsh-abbr
-(( ${#ABBR_REGULAR_USER_ABBREVIATIONS} )) && {
-  ZSH_HIGHLIGHT_HIGHLIGHTERS+=(regexp)
-  typeset -A ZSH_HIGHLIGHT_REGEXP
-  ZSH_HIGHLIGHT_REGEXP+=('^[[:blank:][:space:]]*('${(j:|:)${(Qk)ABBR_REGULAR_USER_ABBREVIATIONS}}')$' 'fg=#8aadf4')
-}
