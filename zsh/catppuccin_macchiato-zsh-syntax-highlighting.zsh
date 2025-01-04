@@ -1,6 +1,6 @@
 # Copied from https://github.com/catppuccin/zsh-syntax-highlighting
 # Alterations:
-#   - Replaced green (#a6da95) with blue (#8aadf4)
+#   - Swapped green (#a6da95) with mauve (#c6a0f6)
 #   - Made path separators white like the rest of the path instead of red
 
 # Catppuccin Macchiato Theme (for zsh-syntax-highlighting)
@@ -20,21 +20,21 @@ ZSH_HIGHLIGHT_STYLES[comment]='fg=#5b6078'
 ## Constants
 ## Entitites
 ## Functions/methods
-ZSH_HIGHLIGHT_STYLES[alias]='fg=#8aadf4'
-ZSH_HIGHLIGHT_STYLES[suffix-alias]='fg=#8aadf4'
-ZSH_HIGHLIGHT_STYLES[global-alias]='fg=#8aadf4'
-ZSH_HIGHLIGHT_STYLES[function]='fg=#8aadf4'
-ZSH_HIGHLIGHT_STYLES[command]='fg=#8aadf4'
-ZSH_HIGHLIGHT_STYLES[precommand]='fg=#8aadf4,italic'
+ZSH_HIGHLIGHT_STYLES[alias]='fg=#c6a0f6'
+ZSH_HIGHLIGHT_STYLES[suffix-alias]='fg=#c6a0f6'
+ZSH_HIGHLIGHT_STYLES[global-alias]='fg=#c6a0f6'
+ZSH_HIGHLIGHT_STYLES[function]='fg=#c6a0f6'
+ZSH_HIGHLIGHT_STYLES[command]='fg=#c6a0f6'
+ZSH_HIGHLIGHT_STYLES[precommand]='fg=#c6a0f6,italic'
 ZSH_HIGHLIGHT_STYLES[autodirectory]='fg=#f5a97f,italic'
 ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=#f5a97f'
 ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=#f5a97f'
-ZSH_HIGHLIGHT_STYLES[back-quoted-argument]='fg=#c6a0f6'
+ZSH_HIGHLIGHT_STYLES[back-quoted-argument]='fg=#a6da95'
 ## Keywords
 ## Built ins
-ZSH_HIGHLIGHT_STYLES[builtin]='fg=#8aadf4'
-ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=#8aadf4'
-ZSH_HIGHLIGHT_STYLES[hashed-command]='fg=#8aadf4'
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=#c6a0f6'
+ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=#c6a0f6'
+ZSH_HIGHLIGHT_STYLES[hashed-command]='fg=#c6a0f6'
 ## Punctuation
 ZSH_HIGHLIGHT_STYLES[commandseparator]='fg=#ed8796'
 ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]='fg=#cad3f5'
@@ -67,7 +67,7 @@ ZSH_HIGHLIGHT_STYLES[path_pathseparator]='fg=#cad3f5,underline'
 ZSH_HIGHLIGHT_STYLES[path_prefix]='fg=#cad3f5,underline'
 ZSH_HIGHLIGHT_STYLES[path_prefix_pathseparator]='fg=#cad3f5,underline'
 ZSH_HIGHLIGHT_STYLES[globbing]='fg=#cad3f5'
-ZSH_HIGHLIGHT_STYLES[history-expansion]='fg=#c6a0f6'
+ZSH_HIGHLIGHT_STYLES[history-expansion]='fg=#a6da95'
 #ZSH_HIGHLIGHT_STYLES[command-substitution]='fg=?'
 #ZSH_HIGHLIGHT_STYLES[command-substitution-unquoted]='fg=?'
 #ZSH_HIGHLIGHT_STYLES[process-substitution]='fg=?'

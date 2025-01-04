@@ -15,6 +15,6 @@ function zvm_after_init() {
     # zsh-abbr highlighting
     (( ${#ABBR_REGULAR_USER_ABBREVIATIONS} )) && {
         ZSH_HIGHLIGHT_HIGHLIGHTERS+=(regexp)
-        ZSH_HIGHLIGHT_REGEXP=('^[[:blank:][:space:]]*('${(j:|:)${(Qk)ABBR_REGULAR_USER_ABBREVIATIONS}}')$' 'fg=#8aadf4')
+        ZSH_HIGHLIGHT_REGEXP=('^[[:blank:][:space:]]*('${(j:|:)${(Qk)ABBR_REGULAR_USER_ABBREVIATIONS}}')$' 'fg=#c6a0f6')
     }
 }
