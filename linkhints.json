@@ -1,0 +1,16 @@
+{
+  "css": ".root {\n  font-family: monospace;\n}\n\n.hint {\n  font-size: 11px;\n  padding: 2px 4px;\n  color: #24273a;\n  background-color: #ed8796;\n  border: 1px solid rgba(34, 36, 38, 0.15);\n  border-radius: 3px;\n  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.3);\n  font-weight: bold;\n}\n\n.highlighted {\n  background-color: #eed49f;\n}\n\n.matchedChars {\n  opacity: 0.3;\n}\n.matchedText { \n  background-color: #8aadf480;\n  border-radius: 3px;\n  border-bottom: unset;\n}\n\n.status {\n  font-size: 12px;\n  padding: 3px 3px 2px 3px;\n  color: black;\n  background-color: #ebebeb;\n  border: 1px solid #b3b3b3;\n  border-radius: 4px 4px 0 0;\n  text-shadow: 0 1px 2px white;\n  min-width: 150px;\n  right: 150px;\n}",
+  "normal.ctrl-j": null,
+  "normal.cmd-Enter": "EnterHintsMode_Click",
+  "normal.ctrl-k": null,
+  "normal.ctrl-l": null,
+  "hints.cmd-Enter": "ActivateHintAlt",
+  "normal.alt-cmd-Enter": "EnterHintsMode_ManyClick",
+  "normal.ctrl-J": null,
+  "normal.ctrl-K": null,
+  "normal.alt-cmd-shift-Enter": "EnterHintsMode_ManyTab",
+  "normal.ctrl-L": null,
+  "normal.ctrl-shift-ArrowUp": null,
+  "normal.cmd-shift-Enter": "EnterHintsMode_BackgroundTab",
+  "hints.ctrl-Enter": null
+}
