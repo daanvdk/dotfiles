@@ -7,6 +7,7 @@ Simply run `setup.zsh`, this will do the following things:
   locations.
 - Install homebrew if not yet installed.
 - Install homebrew packages if needed.
+- Install uv tools if needed.
 - Launch a new zsh shell to apply any changes.
 
 All steps in this process are idempotent and thus to apply any changes the

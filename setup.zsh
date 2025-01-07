@@ -25,9 +25,13 @@ for source in "${(@k)link_map}"; do
     ln -hFs $source $target
 done
 
-# Homebrew
+# Install homebrew & homebrew packages
 which brew > /dev/null || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew bundle install
+
+# Install uv tools
+uv tool install -U --with=python-lsp-ruff python-lsp-server
+uv tool install -U fibro
 
 # Relaunch
 exec zsh
