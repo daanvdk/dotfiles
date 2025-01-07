@@ -15,6 +15,7 @@ link_map=(
     starship.toml              ~/.config/starship.toml
     zsh                        ~/.config/zsh
     zsh-abbr                   ~/.config/zsh-abbr
+    python                     ~/.local/bin/python
 )
 for source in "${(@k)link_map}"; do
     target="${link_map[$source]}"
