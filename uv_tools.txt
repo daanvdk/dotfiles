@@ -1,0 +1,2 @@
+fibro
+python-lsp-server --with=python-lsp-ruff

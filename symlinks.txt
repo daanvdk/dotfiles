@@ -1,0 +1,12 @@
+.gitconfig                 ~/.gitconfig
+.zsh_plugins.txt           ~/.zsh_plugins.txt
+.zsh_plugins_after_zvm.txt ~/.zsh_plugins_after_zvm.txt
+.zshrc                     ~/.zshrc
+Brewfile                   ~/Brewfile
+ghostty                    ~/.config/ghostty
+git                        ~/.config/git
+helix                      ~/.config/helix
+starship.toml              ~/.config/starship.toml
+zsh                        ~/.config/zsh
+zsh-abbr                   ~/.config/zsh-abbr
+python                     ~/.local/bin/python
