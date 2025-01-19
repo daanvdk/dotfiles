@@ -1,6 +1,4 @@
 tap "homebrew/bundle"
-tap "oven-sh/bun"
-
 brew "antidote"
 brew "coreutils"
 brew "fzf"
@@ -17,8 +15,6 @@ brew "uv"
 brew "zig"
 brew "zls"
 brew "zoxide"
-brew "oven-sh/bun/bun"
-
 cask "discord"
 cask "firefox"
 cask "ghostty"
