@@ -9,6 +9,7 @@ brew "gnu-sed"
 brew "grep"
 brew "helix"
 brew "lazygit"
+brew "mas"
 brew "node"
 brew "starship"
 brew "tree"
@@ -29,3 +30,5 @@ cask "numi"
 cask "rectangle"
 cask "spotify"
 cask "whatsapp"
+mas "Affinity Photo", id: 824183456
+mas "Pixen", id: 525180431
