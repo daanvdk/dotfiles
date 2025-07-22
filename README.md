@@ -11,8 +11,3 @@ Simply run `make`, this will do the following things:
 
 If any changes are made to either `symlinks.txt`, `Brewfile` or `uv_tools.txt`
 it is safe to rerun `make` to apply these changes.
-
-## Manual Setup
-Not everything contained in this repo has a scriptable setup. This is a list of
-the manual actions to be taken:
-- In the options menu of the firefox linkhints plugin import `linkhints.json`.

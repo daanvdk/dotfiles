@@ -1,10 +1,23 @@
 [[language]]
 name = "python"
-language-servers = ["pylsp"]
+language-servers = ["basedpyright", "ruff"]
+auto-format = true
 
-[language-server.tinymist]
-command = "tinymist"
+[language-server.basedpyright]
+command = "basedpyright-langserver"
+args = ["--stdio"]
+except-features = ["format"]
+
+[language-server.basedpyright.config]
+python.pythonPath = "/Users/daan/.local/bin/python"
+
+[language-server.ruff]
+command = "ruff"
+args = ["server", "--preview"]
 
 [[language]]
 name = "typst"
 language-servers = ["tinymist"]
+
+[language-server.tinymist]
+command = "tinymist"
