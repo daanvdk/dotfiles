@@ -14,10 +14,3 @@ python.pythonPath = "/Users/daan/.local/bin/python"
 [language-server.ruff]
 command = "ruff"
 args = ["server", "--preview"]
-
-[[language]]
-name = "typst"
-language-servers = ["tinymist"]
-
-[language-server.tinymist]
-command = "tinymist"
