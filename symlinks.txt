@@ -6,6 +6,7 @@ Brewfile                   ~/Brewfile
 ghostty                    ~/.config/ghostty
 git                        ~/.config/git
 helix                      ~/.config/helix
+jj                         ~/.config/jj
 starship.toml              ~/.config/starship.toml
 zsh                        ~/.config/zsh
 zsh-abbr                   ~/.config/zsh-abbr
