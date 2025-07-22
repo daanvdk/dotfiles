@@ -11,10 +11,3 @@ except-features = ["format"]
 [language-server.ruff]
 command = "uv"
 args = ["run", "ruff", "server"]
-
-[[language]]
-name = "typst"
-language-servers = ["tinymist"]
-
-[language-server.tinymist]
-command = "tinymist"
