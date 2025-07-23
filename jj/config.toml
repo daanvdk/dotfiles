@@ -1,3 +1,7 @@
 [user]
 name = "Daan van der Kallen"
 email = "mail@daanvdk.com"
+
+[ui]
+default-command = "log"
+diff-editor = "jjdiff"
