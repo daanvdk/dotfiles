@@ -5,3 +5,5 @@ email = "mail@daanvdk.com"
 [ui]
 default-command = "log"
 diff-editor = "jjdiff"
+diff-instructions = false
+diff-formatter = ["jjdiff", "--print", "$left", "$right"]
