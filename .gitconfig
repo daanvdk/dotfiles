@@ -7,4 +7,3 @@
 	rebase = interactive
 [core]
 	editor = hx
-	excludesFile = ~/.config/git/.gitignore
