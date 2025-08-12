@@ -1,5 +1,4 @@
 format = '$directory$character'
-right_format = '$git_branch$git_metrics'
 add_newline = false
 
 [directory]
