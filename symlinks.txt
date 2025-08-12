@@ -3,6 +3,7 @@
 .zsh_plugins_after_zvm.txt ~/.zsh_plugins_after_zvm.txt
 .zshrc                     ~/.zshrc
 Brewfile                   ~/Brewfile
+docker_config.json         ~/.docker/config.json
 ghostty                    ~/.config/ghostty
 git                        ~/.config/git
 helix                      ~/.config/helix
