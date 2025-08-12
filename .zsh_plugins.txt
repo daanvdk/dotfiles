@@ -1,5 +1,4 @@
 jeffreytse/zsh-vi-mode
-daanvdk/zsh-autosuggestions
-daanvdk/zsh-autosuggest-abbr-history
+zsh-users/zsh-autosuggestions
 zsh-users/zsh-syntax-highlighting
 lincheney/fzf-tab-completion path:zsh

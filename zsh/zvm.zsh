@@ -8,13 +8,4 @@ function zvm_after_init() {
     # fzf
     source <(fzf --zsh)
     bindkey '^I' fzf_completion
-
-    # zsh-abbr suggestions
-    ZSH_AUTOSUGGEST_STRATEGY=abbr_history
-
-    # zsh-abbr highlighting
-    (( ${#ABBR_REGULAR_USER_ABBREVIATIONS} )) && {
-        ZSH_HIGHLIGHT_HIGHLIGHTERS+=(regexp)
-        ZSH_HIGHLIGHT_REGEXP=('^[[:blank:][:space:]]*('${(j:|:)${(Qk)ABBR_REGULAR_USER_ABBREVIATIONS}}')$' 'fg=#c6a0f6')
-    }
 }
