@@ -7,3 +7,6 @@ default-command = "log"
 diff-editor = "jjdiff"
 diff-instructions = false
 diff-formatter = ["jjdiff", "--print", "$left", "$right"]
+ 
+[git]
+private-commits = "description(glob:'private:*')"
