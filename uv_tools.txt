@@ -1,4 +1,4 @@
 basedpyright
 ruff
-jjdiff
+git+https://github.com/daanvdk/jjdiff@main
 poethepoet
