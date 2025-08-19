@@ -1,2 +1,2 @@
 #!/usr/bin/env zsh
-uv run python $@
+uv run python "$@"

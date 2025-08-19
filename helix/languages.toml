@@ -5,15 +5,12 @@ auto-format = true
 
 [language-server.basedpyright]
 command = "basedpyright-langserver"
-args = ["--stdio"]
+args = ["--stdio", "--pythonpath", "~/.local/bin/python"]
 except-features = ["format"]
 
-[language-server.basedpyright.config]
-python.pythonPath = "/Users/daan/.local/bin/python"
-
 [language-server.ruff]
-command = "ruff"
-args = ["server", "--preview"]
+command = "uv"
+args = ["run", "ruff", "server"]
 
 [[language]]
 name = "typst"
