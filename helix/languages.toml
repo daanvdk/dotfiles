@@ -6,7 +6,6 @@ auto-format = true
 [language-server.basedpyright]
 command = "basedpyright-langserver"
 args = ["--stdio", "--pythonpath", "~/.local/bin/python"]
-except-features = ["format"]
 
 [language-server.ruff]
 command = "uv"

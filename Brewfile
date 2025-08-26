@@ -1,3 +1,4 @@
+tap "homebrew/bundle"
 brew "antidote"
 brew "colima"
 brew "coreutils"
@@ -34,4 +35,7 @@ cask "rectangle"
 cask "spotify"
 cask "whatsapp"
 mas "Affinity Photo", id: 824183456
+mas "Keynote", id: 409183694
+mas "Numbers", id: 409203825
+mas "Pages", id: 409201541
 mas "Pixen", id: 525180431
