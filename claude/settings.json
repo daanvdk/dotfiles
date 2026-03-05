@@ -1,0 +1,9 @@
+{
+  "model": "sonnet",
+  "enabledPlugins": {
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "env": {
+    "DISABLE_ZOXIDE": "1"
+  }
+}
