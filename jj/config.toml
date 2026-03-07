@@ -16,7 +16,7 @@ tug = ["bookmark", "move", "--from", "closest_bookmark(@)", "--to", "closest_non
 push = ["git", "push"]
 push-new = ["git", "push", "--change", "closest_nonempty(@)"]
 fetch = ["git", "fetch"]
-rebase-all = ["rebase", "-s", "all:roots(trunk()..mutable())", "-d", "trunk()"]
+rebase-all = ["rebase", "-s", "roots(trunk()..mutable())", "-d", "trunk()"]
 
 [revset-aliases]
 "closest_bookmark(to)" = "heads(::to & bookmarks())"
