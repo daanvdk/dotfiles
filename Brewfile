@@ -1,4 +1,3 @@
-tap "homebrew/bundle"
 brew "antidote"
 brew "colima"
 brew "coreutils"
