@@ -17,7 +17,7 @@ push = ["git", "push"]
 push-new = ["git", "push", "--change", "closest_nonempty(@)"]
 push-all = ["git", "push", "--all"]
 fetch = ["git", "fetch"]
-rebase-all = ["rebase", "-s", "roots(trunk()..mutable())", "-d", "trunk()"]
+rebase-all = ["rebase", "-s", "roots(trunk()..mutable() ~ trunk()::)", "-d", "trunk()"]
 log-trunk = ["log", "-r", "ancestors(trunk(), 10)"]
 
 [revset-aliases]
