@@ -1,2 +1,5 @@
 [diff]
 deprioritize = ["/uv.lock"]
+
+[editor]
+auto_open = true
