@@ -2,12 +2,12 @@
   "env": {
     "DISABLE_ZOXIDE": "1"
   },
-  "model": "sonnet",
-  "enabledPlugins": {
-    "typescript-lsp@claude-plugins-official": true
-  },
   "statusLine": {
     "type": "command",
     "command": "python3 ~/.claude/statusline.py"
-  }
+  },
+  "enabledPlugins": {
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "model": "sonnet"
 }

@@ -26,27 +26,41 @@ if usage_path.is_file() and time.time() - usage_path.stat().st_mtime < 60:
     with usage_path.open("r") as f:
         usage_data = json.load(f)
 else:
-    result = subprocess.run(
-        ["security", "find-generic-password", "-s", "Claude Code-credentials", "-w"],
-        check=True,
-        capture_output=True,
-    )
-    token = json.loads(result.stdout)["claudeAiOauth"]["accessToken"]
-
-    request = Request(
-        "https://api.anthropic.com/api/oauth/usage",
-        headers={
-            "authorization": f"Bearer {token}",
-            "anthropic-beta": "oauth-2025-04-20",
-            "user-agent": "claude-code/2.0.32",
-        },
-    )
-
-    with urlopen(request) as f:
-        usage_data = json.load(f)
-
-    with usage_path.open("w") as f:
-        json.dump(usage_data, f)
+    try:
+        result = subprocess.run(
+            [
+                "security",
+                "find-generic-password",
+                "-s",
+                "Claude Code-credentials",
+                "-w",
+            ],
+            check=True,
+            capture_output=True,
+        )
+        token = json.loads(result.stdout)["claudeAiOauth"]["accessToken"]
+        request = Request(
+            "https://api.anthropic.com/api/oauth/usage",
+            headers={
+                "authorization": f"Bearer {token}",
+                "anthropic-beta": "oauth-2025-04-20",
+                "user-agent": "claude-code/2.0.32",
+            },
+        )
+        with urlopen(request) as f:
+            usage_data = json.load(f)
+    except Exception:
+        if usage_path.is_file():
+            usage_path.touch()
+            with usage_path.open("r") as f:
+                usage_data = json.load(f)
+        else:
+            usage_data = {}
+            with usage_path.open("w") as f:
+                json.dump(usage_data, f)
+    else:
+        with usage_path.open("w") as f:
+            json.dump(usage_data, f)
 
 
 model = get_path(input_data, "model", "display_name", default="Unknown model")
