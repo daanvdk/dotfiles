@@ -1,4 +1,5 @@
 /.symlinks
 /.brew_bundle
 /.uv_tools
+/.python-path
 /jj/repos/
