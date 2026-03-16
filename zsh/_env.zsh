@@ -1,2 +1,2 @@
-export PATH="/Users/daan/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 export EDITOR=hx
